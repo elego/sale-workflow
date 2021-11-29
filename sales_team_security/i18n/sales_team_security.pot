@@ -25,7 +25,6 @@ msgstr ""
 
 #. module: sales_team_security
 #: model:ir.model.fields,help:sales_team_security.field_res_partner__team_id
-#: model:ir.model.fields,help:sales_team_security.field_res_users__team_id
 msgid "If set, this Sales Team will be used for sales and assignations related to this partner"
 msgstr ""
 
@@ -36,7 +35,6 @@ msgstr ""
 
 #. module: sales_team_security
 #: model:ir.model.fields,field_description:sales_team_security.field_res_partner__team_id
-#: model:ir.model.fields,field_description:sales_team_security.field_res_users__team_id
 msgid "Sales Team"
 msgstr ""
 
