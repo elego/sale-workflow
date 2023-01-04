@@ -60,7 +60,7 @@ class SaleOrderTypology(models.Model):
     )
     incoterm_id = fields.Many2one(comodel_name="account.incoterms", string="Incoterm")
     route_id = fields.Many2one(
-        "stock.location.route",
+        "stock.route",
         string="Route",
         domain=[("sale_selectable", "=", True)],
         ondelete="restrict",

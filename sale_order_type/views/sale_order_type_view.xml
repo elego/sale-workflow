@@ -23,6 +23,7 @@
                     </group>
                     <group>
                         <group>
+                            <field name="company_id" invisible="1" />
                             <field
                                 name="warehouse_id"
                                 options="{'no_create': True}"
@@ -32,11 +33,7 @@
                                 name="company_id"
                                 groups="base.group_multi_company"
                             />
-                            <field
-                                name="route_id"
-                                attrs="{'invisible': [('warehouse_id', '=', False)]}"
-                                groups="stock.group_adv_location"
-                            />
+                            <field name="route_id" groups="stock.group_adv_location" />
                             <field name="sequence_id" />
                             <field
                                 name="analytic_account_id"

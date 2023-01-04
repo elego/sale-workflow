@@ -96,21 +96,22 @@ class SaleOrder(models.Model):
             line_vals.update({"route_id": order_type.route_id.id})
             order.order_line.update(line_vals)
 
-    @api.model
-    def create(self, vals):
-        if vals.get("name", _("New")) == _("New") and vals.get("type_id"):
-            sale_type = self.env["sale.order.type"].browse(vals["type_id"])
-            if sale_type.sequence_id:
-                vals["name"] = sale_type.sequence_id.next_by_id(
-                    sequence_date=vals.get("date_order")
-                )
-        return super(SaleOrder, self).create(vals)
+    @api.model_create_multi
+    def create(self, vals_list):
+        for vals in vals_list:
+            if vals.get("name", _("New")) == _("New") and vals.get("type_id"):
+                sale_type = self.env["sale.order.type"].browse(vals["type_id"])
+                if sale_type.sequence_id:
+                    vals["name"] = sale_type.sequence_id.next_by_id(
+                        sequence_date=vals.get("date_order")
+                    )
+        return super().create(vals_list)
 
     def write(self, vals):
         """A sale type could have a different order sequence, so we could
         need to change it accordingly"""
         default_sequence = self._default_sequence_id()
-        if vals.get("type_id"):
+        if vals.get("type_id", False):
             sale_type = self.env["sale.order.type"].browse(vals["type_id"])
             if sale_type.sequence_id:
                 for record in self:
@@ -149,8 +150,6 @@ class SaleOrderLine(models.Model):
     _inherit = "sale.order.line"
 
     @api.onchange("product_id")
-    def product_id_change(self):
-        res = super(SaleOrderLine, self).product_id_change()
+    def _onchange_product_route_id(self):
         if self.order_id.type_id.route_id:
             self.update({"route_id": self.order_id.type_id.route_id})
-        return res
