@@ -38,12 +38,18 @@ class SaleOrder(models.Model):
         get the proper default sequence"""
         force_company = self.company_id.id or self.env.company.id
         return self.env["ir.sequence"].search(
-            [("code", "=", "sale.order"), ("company_id", "in", [force_company, False])],
+            [
+                ("code", "=", "sale.order"),
+                "|",
+                ("company_id", "=", force_company),
+                ("company_id", "=", False),
+            ],
             order="company_id",
             limit=1,
         )
 
     @api.depends("partner_id", "company_id")
+    @api.depends_context("partner_id", "company_id", "company")
     def _compute_sale_type_id(self):
         for record in self:
             if not record.partner_id:
@@ -111,7 +117,7 @@ class SaleOrder(models.Model):
         """A sale type could have a different order sequence, so we could
         need to change it accordingly"""
         default_sequence = self._default_sequence_id()
-        if vals.get("type_id", False):
+        if vals.get("type_id"):
             sale_type = self.env["sale.order.type"].browse(vals["type_id"])
             if sale_type.sequence_id:
                 for record in self:
@@ -144,12 +150,3 @@ class SaleOrder(models.Model):
         if self.type_id:
             res["sale_type_id"] = self.type_id.id
         return res
-
-
-class SaleOrderLine(models.Model):
-    _inherit = "sale.order.line"
-
-    @api.onchange("product_id")
-    def _onchange_product_route_id(self):
-        if self.order_id.type_id.route_id:
-            self.update({"route_id": self.order_id.type_id.route_id})

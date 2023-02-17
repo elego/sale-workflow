@@ -13,27 +13,30 @@
                         bg_color="bg-danger"
                         attrs="{'invisible': [('active', '=', True)]}"
                     />
-                    <group>
-                        <div class="oe_title">
-                            <label for="name" class="oe_edit_only" />
-                            <h1>
-                                <field name="name" />
-                            </h1>
-                        </div>
-                    </group>
+                    <div class="oe_title">
+                        <label for="name" class="oe_edit_only" />
+                        <h1>
+                            <field name="name" />
+                        </h1>
+                    </div>
                     <group>
                         <group>
-                            <field name="company_id" invisible="1" />
+                            <field name="warehouse_id" invisible="1" />
                             <field
                                 name="warehouse_id"
                                 options="{'no_create': True}"
                                 groups="stock.group_stock_multi_warehouses"
                             />
+                            <field name="company_id" invisible="1" />
                             <field
                                 name="company_id"
                                 groups="base.group_multi_company"
                             />
-                            <field name="route_id" groups="stock.group_adv_location" />
+                            <field
+                                name="route_id"
+                                attrs="{'invisible': [('warehouse_id', '=', False)]}"
+                                groups="stock.group_adv_location"
+                            />
                             <field name="sequence_id" />
                             <field
                                 name="analytic_account_id"

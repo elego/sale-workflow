@@ -6,11 +6,9 @@ from freezegun import freeze_time
 
 import odoo.tests.common as common
 from odoo import fields
-from odoo.tests import tagged
-from odoo.tests.common import Form
+from odoo.tests import Form
 
 
-@tagged("post_install", "-at_install")
 class TestSaleOrderType(common.TransactionCase):
     def setUp(self):
         super(TestSaleOrderType, self).setUp()
@@ -131,8 +129,7 @@ class TestSaleOrderType(common.TransactionCase):
         )
 
     def create_sale_order(self, partner=False):
-        # Set a custom context to "disable" the behavior of sale_isolated_quotation
-        sale_form = Form(self.env["sale.order"].with_context(order_sequence="test"))
+        sale_form = Form(self.env["sale.order"])
         sale_form.partner_id = partner or self.partner
         with sale_form.order_line.new() as order_line:
             order_line.product_id = self.product
@@ -147,6 +144,7 @@ class TestSaleOrderType(common.TransactionCase):
         inv_form.sale_type_id = sale_type or self.sale_type
         with inv_form.invoice_line_ids.new() as inv_line:
             inv_line.product_id = self.product
+            inv_line.account_id = self.account
             inv_line.quantity = 1.0
         return inv_form.save()
 
@@ -171,10 +169,17 @@ class TestSaleOrderType(common.TransactionCase):
         order = self.create_sale_order(partner=self.partner_child_1)
         self.assertEqual(order.type_id, self.sale_type)
 
+    def test_sale_order_without_partner(self):
+        sale_order = self.sale_order_model.with_company(1).new()
+        self.assertEqual(sale_order.company_id.id, 1)
+        sale_type = self.env["sale.order.type"].search(
+            [("company_id", "in", [sale_order.company_id.id, False])], limit=1
+        )
+        self.assertEqual(sale_order.type_id, sale_type)
+
     def test_invoice_onchange_type(self):
         sale_type = self.sale_type
         invoice = self.create_invoice()
-        invoice.onchange_sale_type_id()
         self.assertEqual(invoice.invoice_payment_term_id, sale_type.payment_term_id)
         self.assertEqual(invoice.journal_id, sale_type.journal_id)
 
@@ -224,7 +229,6 @@ class TestSaleOrderType(common.TransactionCase):
         # send quotation
         order.action_quotation_sent()
         self.assertTrue(order.state == "sent", "Sale: state after sending is wrong")
-        # change order type on sale order
         order.type_id = self.sale_type_quot
         order.onchange_type_id()
         self.assertEqual(order.type_id, self.sale_type_quot)
@@ -263,3 +267,7 @@ class TestSaleOrderType(common.TransactionCase):
         name = order.name
         order.type_id = self.sale_type_sequence_default
         self.assertEqual(name, order.name, "The sequence shouldn't change!")
+
+    def test_res_partner_copy_data(self):
+        new_partner = self.partner.copy()
+        self.assertEqual(self.partner.sale_type, new_partner.sale_type)

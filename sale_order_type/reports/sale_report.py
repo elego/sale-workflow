@@ -20,6 +20,5 @@ class SaleReport(models.Model):
 
     def _group_by_sale(self):
         res = super()._group_by_sale()
-        res += """,
-            s.type_id"""
+        res += """, s.type_id"""
         return res

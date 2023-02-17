@@ -10,9 +10,13 @@ setuptools.setup(
     install_requires=[
         'odoo-addon-partner_contact_sale_info_propagation>=16.0dev,<16.1dev',
         'odoo-addon-partner_sale_pivot>=16.0dev,<16.1dev',
+        'odoo-addon-sale_automatic_workflow>=16.0dev,<16.1dev',
         'odoo-addon-sale_commercial_partner>=16.0dev,<16.1dev',
+        'odoo-addon-sale_exception>=16.0dev,<16.1dev',
         'odoo-addon-sale_order_line_menu>=16.0dev,<16.1dev',
         'odoo-addon-sale_order_lot_selection>=16.0dev,<16.1dev',
+        'odoo-addon-sale_order_type>=16.0dev,<16.1dev',
+        'odoo-addon-sale_triple_discount>=16.0dev,<16.1dev',
     ],
     classifiers=[
         'Programming Language :: Python',
